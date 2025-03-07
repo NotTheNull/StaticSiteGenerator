@@ -21,29 +21,38 @@ def text_node_to_html_node(text_node):
             raise Exception(f"Text Type {text_node.text_type} is not supported")
     
 
-# def __text_to_anchor_tag(text_node):
-#     # sample text:  [Boots](https://boot.dev)
-#     if text_node.text_type != TextType.URL: raise ValueError("This conversion is for Anchor tags only")
+def split_nodes_delimiter(old_nodes, delimiter, text_type):
+    new_nodes = []
+    for node in old_nodes:
+        if node.text_type != TextType.NORMAL:
+            new_nodes.append(node)
+            continue
 
-#     link_text_pos_end = text_node.text.index("]")
-#     link_text = text_node.text[1:link_text_pos_end]
+        new_nodes.extend(__split_text_into_nodes(node.text, delimiter, text_type))
 
-#     src_pos_start = text_node.text.index("(")
-#     src_pos_end = text_node.text.index(")")
-#     src = text_node.text[src_pos_start:src_pos_end]
+    return new_nodes
 
-#     return LeafNode("a", link_text, {"href": f"{src}"})
+def __split_text_into_nodes(text, delimiter, text_type):
+    if text == None: return []
+    if len(text.strip()) == 0: return []
 
-# def __text_to_img_tag(text_node):
-#     # sample text:  ![alt text for image](url/of/image.jpg)
-#     if text_node.text_type != TextType.IMAGE: raise ValueError("This conversion is for Image tags only")
+    if delimiter in text:
+        node_list = []
 
-#     alt_pos_end = text_node.text.index("]")
-#     alt = text_node.text[2:alt_pos_end]
+        pos_start = text.find(delimiter)
+        node_list.append(TextNode(text[0:pos_start], TextType.NORMAL, None))
 
-#     src_pos_start = text_node.text.index("(")
-#     src_pos_end = text_node.text.index(")")
-#     src = text_node.text[src_pos_start:src_pos_end]
+        loop_text = text[pos_start + len(delimiter):]
+        pos_end = loop_text.find(delimiter)
+        if pos_end < 0: raise Exception("Invalid markup")
 
-#     return LeafNode("img", " ", {"src": f"{src}", "alt": f"{alt}"})
+        node_list.append(TextNode(loop_text[0:pos_end], text_type, None))
+        loop_text = loop_text[pos_end + len(delimiter):]
+        node_list.append(TextNode(loop_text, TextType.NORMAL, None))
+
+        return node_list
+
+    else:
+        return [TextNode(text, TextType.NORMAL, None)]
+
 
