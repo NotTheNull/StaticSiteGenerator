@@ -1,3 +1,4 @@
+import re
 from textnode import *
 from parentnode import ParentNode
 from leafnode import LeafNode
@@ -54,5 +55,21 @@ def __split_text_into_nodes(text, delimiter, text_type):
 
     else:
         return [TextNode(text, TextType.NORMAL, None)]
+
+
+
+
+#![rick roll](https://i.imgur.com/aKaOqIh.gif)
+markdown_img_regex = r"!\[([^\[\]]*)\]\(([^\(\)]*)\)"
+def extract_markdown_images(text):
+    return re.findall(markdown_img_regex, text)
+    
+
+#[boot dev](https://boot.dev)
+markdown_link_regex = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)"
+def extract_markdown_links(text):
+    return re.findall(markdown_link_regex, text)
+    
+
 
 

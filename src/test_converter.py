@@ -1,4 +1,5 @@
 import unittest
+import re
 from converter import *
 from textnode import *
 
@@ -47,9 +48,15 @@ class Test_Converter(unittest.TestCase):
         sut = text_node_to_html_node(text)
         self.assertEqual(sut.to_html(), expected)
 
-    
+    TEST_MARKDOWN_IMAGE = "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
+    def test_extract_markdown_images(self):
+        matches = extract_markdown_images(Test_Converter.TEST_MARKDOWN_IMAGE)
+        self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], matches)
 
-
+    TEST_MARKDOWN_LINK = "This is text with a link [Boot Dev](https://boot.dev)"
+    def test_extract_markdown_links(self):
+        matches = extract_markdown_links(Test_Converter.TEST_MARKDOWN_LINK)
+        self.assertListEqual([("Boot Dev", "https://boot.dev")], matches)
 
 
 if __name__ == "__main__":
