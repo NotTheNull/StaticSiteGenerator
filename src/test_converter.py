@@ -59,5 +59,34 @@ class Test_Converter(unittest.TestCase):
         self.assertListEqual([("Boot Dev", "https://boot.dev")], matches)
 
 
+    TEST_MULTIPLE_IMAGES =  "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)"
+    def test_split_images(self):
+        node = TextNode(Test_Converter.TEST_MULTIPLE_IMAGES, TextType.NORMAL, None)
+        new_nodes = split_nodes_images([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", TextType.NORMAL),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.NORMAL),
+                TextNode("second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"),
+            ],
+            new_nodes,
+        )
+
+    TEST_MULTIPLE_LINKS = "The videos from [Boot Dev](https://boot.dev) should be viewable on [YouTube](https://www.youtube.com)"
+    def test_split_links(self):
+        node = TextNode(Test_Converter.TEST_MULTIPLE_LINKS, TextType.NORMAL, None)
+        new_nodes = split_nodes_links([node])
+        self.assertListEqual(
+            [
+                TextNode("The videos from ", TextType.NORMAL),
+                TextNode("Boot Dev", TextType.URL, "https://boot.dev"),
+                TextNode(" should be viewable on ", TextType.NORMAL),
+                TextNode("YouTube", TextType.URL, "https://www.youtube.com")
+            ],
+            new_nodes
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

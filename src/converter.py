@@ -58,6 +58,57 @@ def __split_text_into_nodes(text, delimiter, text_type):
 
 
 
+def split_nodes_images(old_nodes):
+    return [img for lst in list(map(__split_markdown_images, old_nodes)) for img in lst]
+    
+
+def __split_markdown_images(node):
+    if node.text_type != TextType.NORMAL: return [node]
+
+    images = extract_markdown_images(node.text)
+    if len(images) == 0: return [node]
+
+    node_list = []
+    pos_start = 0
+    pos_end = 1
+    for img in images:
+        pos_end = node.text.index(img[0]) - 2
+        node_list.append(TextNode(node.text[pos_start:pos_end], TextType.NORMAL, None))
+
+        pos_start = node.text.index(img[1]) + len(img[1]) + 1 # the +1 covers the closing parenthesis
+        node_list.append(TextNode(img[0], TextType.IMAGE, img[1]))
+
+    if len(node.text.strip()) > pos_start:
+        node_list.append(node.text[pos_start:])
+
+    return node_list
+
+
+def split_nodes_links(old_nodes):
+    return [link for lst in list(map(__split_markdown_links, old_nodes)) for link in lst]
+
+def __split_markdown_links(node):
+    if node.text_type != TextType.NORMAL: return [node]
+
+    links = extract_markdown_links(node.text)
+    if len(links) == 0: return [node]
+
+    node_list = []
+    pos_start = 0
+    pos_end = 1
+    for link in links:
+        pos_end = node.text.index(link[0]) - 1
+        node_list.append(TextNode(node.text[pos_start:pos_end], TextType.NORMAL, None))
+
+        pos_start = node.text.index(link[1]) + len(link[1]) + 1
+        node_list.append(TextNode(link[0], TextType.URL, link[1]))
+
+    if len(node.text.strip()) > pos_start:
+        node_list.append(node.text[pos_start:])
+
+    return node_list
+
+
 
 #![rick roll](https://i.imgur.com/aKaOqIh.gif)
 markdown_img_regex = r"!\[([^\[\]]*)\]\(([^\(\)]*)\)"
