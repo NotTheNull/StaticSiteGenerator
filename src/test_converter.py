@@ -87,6 +87,34 @@ class Test_Converter(unittest.TestCase):
             new_nodes
         )
 
+    def test_split_links_withoutlinks(self):
+        test_node = [TextNode("This is a normal string", TextType.NORMAL, None)]
+        sut = split_nodes_links(test_node)
+        self.assertListEqual(
+            test_node,
+            sut
+        )
+
+
+    TEST_FULL_MARKDOWN = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+    def test_full_markdown_to_text(self):
+        sut = text_to_text_nodes(Test_Converter.TEST_FULL_MARKDOWN)
+
+        self.assertListEqual(
+            [
+                TextNode("This is ", TextType.NORMAL),
+                TextNode("text", TextType.BOLD),
+                TextNode(" with an ", TextType.NORMAL),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" word and a ", TextType.NORMAL),
+                TextNode("code block", TextType.CODE),
+                TextNode(" and an ", TextType.NORMAL),
+                TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+                TextNode(" and a ", TextType.NORMAL),
+                TextNode("link", TextType.URL, "https://boot.dev"),
+            ],
+            sut
+        )
 
 if __name__ == "__main__":
     unittest.main()

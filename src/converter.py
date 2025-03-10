@@ -23,6 +23,8 @@ def text_node_to_html_node(text_node):
     
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
+    if not isinstance(old_nodes, list): raise ValueError("1st Argument must be a list of TextNodes")
+
     new_nodes = []
     for node in old_nodes:
         if node.text_type != TextType.NORMAL:
@@ -59,10 +61,13 @@ def __split_text_into_nodes(text, delimiter, text_type):
 
 
 def split_nodes_images(old_nodes):
+    if not isinstance(old_nodes, list): raise ValueError("Argument must be a list of TextNodes")
+
     return [img for lst in list(map(__split_markdown_images, old_nodes)) for img in lst]
     
 
 def __split_markdown_images(node):
+    if not isinstance(node, TextNode): raise ValueError("Argument MUST be a TextNode")
     if node.text_type != TextType.NORMAL: return [node]
 
     images = extract_markdown_images(node.text)
@@ -79,15 +84,18 @@ def __split_markdown_images(node):
         node_list.append(TextNode(img[0], TextType.IMAGE, img[1]))
 
     if len(node.text.strip()) > pos_start:
-        node_list.append(node.text[pos_start:])
+        node_list.append(TextNode(node.text[pos_start:], TextType.NORMAL, None))
 
     return node_list
 
 
 def split_nodes_links(old_nodes):
+    if not isinstance(old_nodes, list): raise ValueError("Argument must be a list of TextNodes")
+
     return [link for lst in list(map(__split_markdown_links, old_nodes)) for link in lst]
 
 def __split_markdown_links(node):
+    if not isinstance(node, TextNode): raise ValueError("Argument MUST be a TextNode")
     if node.text_type != TextType.NORMAL: return [node]
 
     links = extract_markdown_links(node.text)
@@ -104,7 +112,7 @@ def __split_markdown_links(node):
         node_list.append(TextNode(link[0], TextType.URL, link[1]))
 
     if len(node.text.strip()) > pos_start:
-        node_list.append(node.text[pos_start:])
+        node_list.append(TextNode(node.text[pos_start:], TextType.NORMAL, None))
 
     return node_list
 
@@ -122,5 +130,21 @@ def extract_markdown_links(text):
     return re.findall(markdown_link_regex, text)
     
 
-
+def text_to_text_nodes(text):
+    return split_nodes_delimiter(
+        split_nodes_delimiter(
+            split_nodes_delimiter(
+                split_nodes_links(
+                    split_nodes_images(
+                        [TextNode(text, TextType.NORMAL, None)]
+                    )
+                ),
+                "`",
+                TextType.CODE
+            ),
+            "_",
+            TextType.ITALIC
+        ), 
+        "**", 
+        TextType.BOLD)
 
