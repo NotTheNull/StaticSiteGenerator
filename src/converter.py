@@ -148,3 +148,14 @@ def text_to_text_nodes(text):
         "**", 
         TextType.BOLD)
 
+
+def markdown_to_blocks(markdown):
+    if markdown is None: return []
+    if len(markdown.strip()) == 0: return []
+
+    blocks = []
+    for txt in markdown.split("\n\n"):
+        if len(txt.strip()) == 0: continue
+        blocks.append(txt.strip())
+
+    return blocks

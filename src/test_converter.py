@@ -96,9 +96,9 @@ class Test_Converter(unittest.TestCase):
         )
 
 
-    TEST_FULL_MARKDOWN = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
-    def test_full_markdown_to_text(self):
-        sut = text_to_text_nodes(Test_Converter.TEST_FULL_MARKDOWN)
+    TEST_MULTI_MARKDOWN = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+    def TEST_MULTI_MARKDOWN_to_text(self):
+        sut = text_to_text_nodes(Test_Converter.TEST_MULTI_MARKDOWN)
 
         self.assertListEqual(
             [
@@ -115,6 +115,29 @@ class Test_Converter(unittest.TestCase):
             ],
             sut
         )
+
+
+    TEST_FULL_MARKDOWN = """
+This is **bolded** paragraph
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+"""
+    def test_markdown_to_blocks(self):
+        blocks = markdown_to_blocks(Test_Converter.TEST_FULL_MARKDOWN)
+        self.assertEqual(
+            blocks,
+            [
+                "This is **bolded** paragraph",
+                "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+                "- This is a list\n- with items",
+            ],
+        )
+
+
 
 if __name__ == "__main__":
     unittest.main()
