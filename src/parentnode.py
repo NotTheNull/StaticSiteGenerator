@@ -1,9 +1,10 @@
 from htmlnode import HTMLNode
 
 class ParentNode(HTMLNode):
-    def __init__(self, tag, children, props):
+    def __init__(self, tag, children, props = None):
         if tag == None: raise ValueError("Tag MUST be provided for Parent Nodes")
         if children == None: raise ValueError("Children MUST be defined for Parent Nodes")
+        if not isinstance(children, list): raise ValueError("Children MUST be a List")
 
         super().__init__(tag, None, children, props)
 

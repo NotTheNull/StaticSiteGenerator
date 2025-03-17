@@ -25,6 +25,37 @@ def markdown_to_blocks(markdown):
 
     return blocks
 
+# will use proper regex to extract the text from the markdown 
+def get_block_text(block, block_type):
+    match(block_type):
+        case BlockType.CODE:
+            return __get_code_text(block)
+        case BlockType.HEADING:
+            return __get_heading_text(block)
+        case BlockType.QUOTE:
+            return __get_quote_text(block)
+        case BlockType.UNORDERED_LIST:
+            return __get_unordered_text(block)
+        case BlockType.ORDERED_LIST:
+            return __get_ordered_text(block)
+        case BlockType.PARAGRAPH:
+            return [block.replace("\n", " ")]
+        case _:
+            raise Exception(f"Block type {block_type} is not supported")
+
+
+def __build_extract(pattern):
+    def extract(markdown):
+        return re.findall(pattern, markdown)
+    return extract
+
+__get_quote_text = __build_extract(r"\>([\ \w]+)")
+__get_heading_text = __build_extract(r"(#{1,6})([\ \w]+)")
+__get_code_text = __build_extract(r"```\n([\W\w\n]+)```")
+__get_unordered_text = __build_extract(r"\- ([\ \w]+)")
+__get_ordered_text = __build_extract(r"\d+\. ([\ \w]+)")
+
+
 def block_to_block_type(block):
     if block == None: raise ValueError("Argument cannot be NULL")
     if len(block.strip()) == 0: raise ValueError("Argument should not be blank")
